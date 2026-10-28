@@ -1,0 +1,7 @@
+services:
+  - type: web
+    name: enc-mat-1cia
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:app
+    plan: free
