@@ -1,0 +1,1075 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard — Enc Mat 1ª Cia</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --primary:#8b0000;--primary-hover:#c0392b;--primary-light:#e74c3c;--primary-glow:rgba(139,0,0,.5);
+  --bg:#0a0a0a;--bg-2:#0d0d0d;--card:rgba(20,20,20,.85);--card-2:rgba(28,28,28,.9);
+  --border:rgba(255,255,255,.08);--border-strong:rgba(255,255,255,.15);
+  --text:#eaeaea;--text-2:#aaa;--text-3:#777;
+  --ok:#4caf50;--warn:#e0b451;
+  --radius:14px;--radius-sm:10px;
+}
+html{scroll-behavior:smooth;-webkit-tap-highlight-color:transparent}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen,Ubuntu,sans-serif;
+  background:radial-gradient(ellipse at 30% 0%,#140505 0%,#0a0a0a 60%);color:var(--text);
+  min-height:100vh;display:flex;flex-direction:column;-webkit-font-smoothing:antialiased;overflow-x:hidden;}
+.escondido{display:none !important}
+::-webkit-scrollbar{width:10px;height:10px}
+::-webkit-scrollbar-thumb{background:rgba(255,255,255,.12);border-radius:6px}
+::-webkit-scrollbar-track{background:transparent}
+
+.cabecalho{background:rgba(0,0,0,.88);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  border-bottom:1px solid rgba(139,0,0,.2);position:sticky;top:0;z-index:40;transition:all .3s ease;}
+.cabecalho-inner{max-width:1200px;margin:0 auto;padding:12px 20px;display:flex;align-items:center;justify-content:space-between;gap:16px;}
+.marca{display:flex;align-items:center;gap:12px;text-decoration:none;color:inherit;min-width:0}
+.marca img{width:40px;height:40px;object-fit:contain;filter:drop-shadow(0 0 20px rgba(139,0,0,.35));transition:transform .3s ease;}
+.marca:hover img{transform:scale(1.08) rotate(-3deg)}
+.marca-txt h1{font-size:1rem;font-weight:700;color:#fff;letter-spacing:.5px}
+.marca-txt p{font-size:.68rem;color:#888;letter-spacing:.15em;text-transform:uppercase;font-weight:600;margin-top:2px}
+.cabecalho-acoes{display:flex;align-items:center;gap:14px}
+.relogio{text-align:right;line-height:1.15}
+.relogio .hora{font-size:1rem;font-weight:700;color:#fff;font-variant-numeric:tabular-nums}
+.relogio .data{font-size:.68rem;color:#888;text-transform:uppercase;letter-spacing:.1em;font-weight:600}
+
+.app{max-width:1200px;margin:0 auto;padding:28px 20px 80px;flex:1;width:100%}
+
+/* AVISO BACKUP */
+.aviso-backup{
+  display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;
+  background:linear-gradient(135deg,rgba(139,0,0,.15),rgba(192,57,43,.05));
+  border:1px solid rgba(139,0,0,.3);border-radius:12px;
+  padding:12px 16px;margin-bottom:20px;font-size:.85rem;
+}
+.aviso-backup .txt{display:flex;align-items:center;gap:10px;color:#ddd;flex-wrap:wrap}
+.aviso-backup .txt b{color:#fff}
+.aviso-backup .acoes-backup{display:flex;gap:8px;flex-wrap:wrap}
+.aviso-backup .btn{padding:8px 14px;font-size:.82rem}
+
+.contadores{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:28px}
+.card-contador{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+  padding:20px;position:relative;overflow:hidden;backdrop-filter:blur(10px);
+  transition:transform .35s cubic-bezier(.175,.885,.32,1.275),border-color .3s ease,box-shadow .3s ease;}
+.card-contador:hover{transform:translateY(-5px);border-color:rgba(139,0,0,.45);box-shadow:0 15px 45px rgba(139,0,0,.2);}
+.card-contador::before{content:'';position:absolute;left:0;top:0;bottom:0;width:4px;border-radius:4px 0 0 4px;transition:width .3s ease;}
+.card-contador:hover::before{width:5px}
+.card-contador.pendente::before{background:var(--warn);box-shadow:0 0 15px rgba(224,180,81,.5)}
+.card-contador.devolvida::before{background:var(--ok);box-shadow:0 0 15px rgba(76,175,80,.5)}
+.card-contador.dias::before{background:var(--primary-light);box-shadow:0 0 15px var(--primary-glow)}
+.card-contador .topo{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.card-contador h3{font-size:.7rem;text-transform:uppercase;letter-spacing:.14em;color:#888;font-weight:700}
+.card-contador .icon{width:32px;height:32px;border-radius:8px;background:rgba(255,255,255,.04);
+  border:1px solid var(--border);display:flex;align-items:center;justify-content:center;color:#aaa;transition:transform .3s ease;}
+.card-contador:hover .icon{transform:scale(1.1) rotate(-6deg)}
+.card-contador .icon svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.card-contador .num{font-size:2.2rem;font-weight:800;color:#fff;line-height:1;letter-spacing:-.02em;font-variant-numeric:tabular-nums;}
+.card-contador .sub{font-size:.75rem;color:#777;margin-top:10px;padding-top:10px;border-top:1px dashed var(--border)}
+
+.barra-acoes{display:flex;gap:14px;flex-wrap:wrap;justify-content:space-between;align-items:center;margin-bottom:20px}
+.abas{display:flex;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:4px;backdrop-filter:blur(10px)}
+.aba{padding:9px 18px;border:none;background:transparent;color:#aaa;font-weight:600;font-size:.88rem;
+  cursor:pointer;border-radius:8px;transition:all .3s cubic-bezier(.175,.885,.32,1.275);
+  display:inline-flex;align-items:center;gap:8px;font-family:inherit;}
+.aba:hover{color:#fff;background:rgba(255,255,255,.04)}
+.aba.ativa{background:linear-gradient(135deg,var(--primary),var(--primary-hover));color:#fff;box-shadow:0 2px 12px rgba(139,0,0,.4);}
+.aba .badge{background:rgba(255,255,255,.2);padding:2px 7px;border-radius:5px;font-size:.7rem;font-weight:700}
+.aba:not(.ativa) .badge{background:rgba(255,255,255,.06);color:#aaa}
+.busca-wrap{flex:1;min-width:240px;position:relative}
+.busca-wrap input{width:100%;padding:11px 14px 11px 42px;background:var(--card);border:1px solid var(--border);border-radius:12px;
+  color:var(--text);font-family:inherit;font-size:.9rem;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23777' stroke-width='2' stroke-linecap='round'%3E%3Ccircle cx='11' cy='11' r='7'/%3E%3Cpath d='M21 21l-4.3-4.3'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:14px center;transition:border-color .2s,box-shadow .2s;}
+.busca-wrap input::placeholder{color:#666}
+.busca-wrap input:focus{outline:none;border-color:rgba(139,0,0,.5);box-shadow:0 0 0 3px rgba(139,0,0,.15)}
+
+.lista-cautelas{display:flex;flex-direction:column;gap:10px}
+.item-cautela{display:flex;align-items:center;gap:14px;background:var(--card);border:1px solid var(--border);
+  border-radius:12px;padding:14px 18px;cursor:pointer;backdrop-filter:blur(10px);transition:all .3s cubic-bezier(.175,.885,.32,1.275);}
+.item-cautela:hover{border-color:rgba(139,0,0,.5);transform:translateY(-3px);box-shadow:0 12px 35px rgba(139,0,0,.18);}
+.item-cautela .avatar{width:44px;height:44px;border-radius:10px;flex-shrink:0;
+  background:linear-gradient(135deg,rgba(139,0,0,.3),rgba(192,57,43,.15));color:#fff;font-weight:800;font-size:.85rem;
+  display:flex;align-items:center;justify-content:center;letter-spacing:.02em;border:1px solid rgba(139,0,0,.3);transition:transform .3s ease;}
+.item-cautela:hover .avatar{transform:scale(1.06) rotate(-3deg)}
+.item-cautela .info{flex:1;min-width:0}
+.item-cautela .info h4{font-size:.95rem;font-weight:700;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.item-cautela .info p{font-size:.8rem;color:#888;margin-top:3px}
+.item-cautela .status{font-size:.7rem;font-weight:700;text-transform:uppercase;padding:5px 11px;
+  border-radius:20px;letter-spacing:.06em;white-space:nowrap;flex-shrink:0;}
+.status.pendente{background:rgba(224,180,81,.15);color:var(--warn);border:1px solid rgba(224,180,81,.3)}
+.status.devolvida{background:rgba(76,175,80,.15);color:var(--ok);border:1px solid rgba(76,175,80,.3)}
+.vazio{text-align:center;padding:60px 20px;color:#666;background:var(--card);border:1px dashed var(--border);border-radius:var(--radius);font-size:.95rem;}
+.vazio svg{width:60px;height:60px;margin-bottom:14px;opacity:.4;stroke:#666;fill:none;stroke-width:1.3}
+
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:11px 20px;border-radius:10px;
+  font-family:inherit;font-size:.9rem;font-weight:600;cursor:pointer;border:1px solid transparent;
+  transition:all .3s cubic-bezier(.175,.885,.32,1.275);white-space:nowrap;}
+.btn:active{transform:translateY(1px)}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.btn-primario{background:linear-gradient(135deg,var(--primary),var(--primary-hover));color:#fff;box-shadow:0 4px 20px rgba(139,0,0,.35);}
+.btn-primario:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 8px 30px rgba(139,0,0,.5)}
+.btn-secundario{background:rgba(255,255,255,.04);color:#fff;border-color:var(--border)}
+.btn-secundario:hover{background:rgba(255,255,255,.08);border-color:var(--border-strong);transform:translateY(-1px)}
+.btn-perigo{background:transparent;color:#ff6b6b;border-color:rgba(255,107,107,.3)}
+.btn-perigo:hover{background:rgba(255,107,107,.08);transform:translateY(-1px)}
+
+input,textarea,select{width:100%;padding:11px 14px;background:rgba(0,0,0,.4);border:1px solid var(--border);
+  border-radius:10px;color:var(--text);font-family:inherit;font-size:.92rem;transition:all .2s;}
+input::placeholder,textarea::placeholder{color:#666}
+input:focus,textarea:focus{outline:none;border-color:rgba(139,0,0,.5);box-shadow:0 0 0 3px rgba(139,0,0,.15)}
+input[type="date"]{color-scheme:dark}
+textarea{resize:vertical;min-height:60px}
+label{display:flex;flex-direction:column;gap:6px;font-size:.82rem;color:#aaa;font-weight:600}
+label .obrig{color:var(--primary-light)}
+
+.titulo-secao{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:22px;flex-wrap:wrap;}
+.titulo-secao h2{font-size:1.4rem;color:#fff;font-weight:700;display:flex;align-items:center;gap:12px;}
+.titulo-secao h2::before{content:'';display:inline-block;width:4px;height:22px;
+  background:linear-gradient(180deg,var(--primary-hover),var(--primary));border-radius:2px;box-shadow:0 0 12px var(--primary-glow);}
+
+.card-form{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+  padding:24px;margin-bottom:18px;backdrop-filter:blur(10px);transition:border-color .2s,box-shadow .2s;}
+.card-form:focus-within{border-color:rgba(139,0,0,.35);box-shadow:0 0 0 1px rgba(139,0,0,.15)}
+.card-form h2{font-size:.8rem;text-transform:uppercase;letter-spacing:.14em;color:var(--primary-light);
+  font-weight:700;border-bottom:1px solid var(--border);padding-bottom:14px;margin-bottom:20px;}
+.grid-form{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px}
+.linha-material{display:grid;grid-template-columns:2fr 80px 2fr 40px;gap:10px;margin-bottom:10px;align-items:center}
+.btn-remover{background:rgba(255,107,107,.08);border:1px solid rgba(255,107,107,.3);color:#ff6b6b;
+  border-radius:10px;cursor:pointer;font-size:1.1rem;height:44px;display:flex;align-items:center;justify-content:center;transition:all .2s;}
+.btn-remover:hover{background:rgba(255,107,107,.15);transform:scale(1.05)}
+.btn-add{width:100%;padding:12px;background:transparent;border:1.5px dashed var(--border-strong);color:#aaa;
+  border-radius:10px;cursor:pointer;margin-top:6px;font-weight:600;font-size:.88rem;transition:all .2s;font-family:inherit;}
+.btn-add:hover:not(:disabled){border-color:var(--primary-hover);color:var(--primary-light);background:rgba(139,0,0,.05);transform:translateY(-1px)}
+.btn-add:disabled{opacity:.4;cursor:not-allowed}
+
+.canvas-wrapper{position:relative;border:1px dashed var(--border-strong);border-radius:10px;
+  background:#f4f4f4;overflow:hidden;height:160px;transition:border-color .2s;}
+.canvas-wrapper.assinado{border-style:solid;border-color:var(--primary-hover)}
+.canvas-wrapper canvas{width:100%;height:100%;display:block;cursor:crosshair;touch-action:none}
+.canvas-wrapper .dica{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  color:#8a8a8a;font-size:.85rem;font-weight:500;pointer-events:none;text-align:center;padding:0 20px;}
+.canvas-wrapper.assinado .dica{display:none}
+
+.assinaturas-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:10px}
+.assinatura-bloco{display:flex;flex-direction:column;gap:8px}
+.assinatura-bloco .titulo-assinatura{font-size:.8rem;color:var(--text);font-weight:700;
+  display:flex;align-items:center;justify-content:space-between;text-transform:uppercase;letter-spacing:.08em;}
+.assinatura-bloco .titulo-assinatura .status{font-size:.7rem;font-weight:700;padding:3px 8px;border-radius:5px;
+  background:rgba(255,107,107,.12);color:#ff6b6b;border:1px solid rgba(255,107,107,.25);
+  text-transform:uppercase;letter-spacing:.05em;}
+.assinatura-bloco .titulo-assinatura .status.ok{background:rgba(76,175,80,.12);color:var(--ok);border-color:rgba(76,175,80,.3);}
+
+.barra-fixa{position:fixed;bottom:0;left:0;right:0;z-index:45;background:rgba(10,10,10,.95);
+  border-top:1px solid rgba(139,0,0,.25);box-shadow:0 -4px 20px rgba(0,0,0,.4);
+  padding:14px 20px;backdrop-filter:blur(20px);animation:slideUp .4s cubic-bezier(.175,.885,.32,1.275) both;}
+@keyframes slideUp{from{opacity:0;transform:translateY(100%)}to{opacity:1;transform:translateY(0)}}
+.barra-fixa .container{max-width:1200px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;gap:16px}
+.info-barra{display:flex;gap:10px;align-items:center;flex-wrap:wrap;font-size:.85rem;color:#aaa}
+.chip{padding:4px 10px;border-radius:6px;background:rgba(255,255,255,.05);border:1px solid var(--border);
+  font-size:.75rem;font-weight:700;transition:all .25s ease;}
+.chip.ok{background:rgba(76,175,80,.12);color:var(--ok);border-color:rgba(76,175,80,.3)}
+.acoes-barra{display:flex;gap:10px}
+
+/* FICHA */
+.folha-container{background:rgba(0,0,0,.5);padding:30px 16px;border-radius:var(--radius);
+  margin-bottom:22px;display:flex;justify-content:center;border:1px solid var(--border);perspective:1400px;}
+.folha-preview{background:#fff;color:#000;width:100%;max-width:800px;padding:46px 50px;
+  font-family:"Times New Roman",Times,serif;font-size:11pt;line-height:1.4;box-shadow:0 10px 40px rgba(0,0,0,.6);
+  transition:transform .4s cubic-bezier(.175,.885,.32,1.275),box-shadow .4s ease;}
+.folha-preview:hover{transform:rotateX(2deg) rotateY(-1deg) translateY(-2px);box-shadow:0 20px 60px rgba(0,0,0,.7)}
+
+.doc-header{text-align:center;margin-bottom:14px;line-height:1.35}
+.doc-header p{font-weight:bold;font-size:10.5pt;margin:1px 0;text-transform:uppercase;letter-spacing:.3px}
+.doc-header .sub{font-weight:normal;font-style:italic;font-size:9.5pt;text-transform:none}
+.doc-visto{text-align:right;margin-bottom:10px;font-size:10pt;line-height:1.5}
+.doc-visto img{max-height:48px;max-width:200px;display:inline-block;margin:2px 0}
+.doc-visto .legenda{font-size:9pt;font-style:italic;display:block;margin-top:2px}
+.doc-titulo{text-align:center;font-weight:bold;font-size:12pt;margin:14px 0 10px;text-transform:uppercase;letter-spacing:1.2px}
+.doc-texto{text-align:justify;text-indent:50px;margin-bottom:14px;font-size:10pt;line-height:1.5}
+.doc-tabela{width:100%;border-collapse:collapse;margin-bottom:14px}
+.doc-tabela th,.doc-tabela td{border:1px solid #000;padding:4px 6px;font-size:10pt;height:20px}
+.doc-tabela th{background:#eee;text-align:center;font-weight:bold;font-size:8.5pt;text-transform:uppercase;height:auto;padding:5px 6px}
+.doc-tabela .col-nr{width:38px;text-align:center;font-weight:bold}
+.doc-tabela .col-qtd{width:55px;text-align:center}
+.doc-data{text-align:right;margin-bottom:18px;font-size:10pt}
+.doc-assinatura{text-align:center;margin-bottom:16px}
+.doc-assinatura img{max-height:55px;max-width:250px;display:block;margin:0 auto}
+.doc-assinatura .linha{width:280px;border-top:1px solid #000;margin:0 auto;padding-top:3px;font-size:10pt}
+.doc-dados{border:1px solid #000;padding:8px 12px;margin-bottom:14px;font-size:9.5pt;line-height:1.5}
+.doc-dados .titulo-dados{font-weight:bold;text-transform:uppercase;font-size:9pt;margin-bottom:6px;letter-spacing:.5px}
+.doc-dados .linha-dado{margin:2px 0}
+.doc-devolucao{margin-top:14px;font-size:10pt;line-height:1.5}
+.doc-devolucao .titulo-dev{font-weight:bold;text-transform:uppercase;margin-bottom:6px;letter-spacing:.4px;font-size:10pt}
+.doc-devolucao .check{margin:6px 0;letter-spacing:.5px}
+.doc-devolucao .check span{margin-right:20px;display:inline-block}
+.doc-devolucao .linha-alteracao{border-bottom:1px solid #000;min-height:22px;margin:4px 0 12px;padding:2px 4px;font-style:italic}
+.doc-assinatura-receb{text-align:center;margin-top:10px}
+.doc-assinatura-receb img{max-height:45px;max-width:250px;display:block;margin:0 auto 2px}
+.doc-assinatura-receb .linha{width:280px;border-top:1px solid #000;margin:0 auto;padding-top:3px;font-size:10pt}
+.doc-assinatura-receb p{margin:2px 0;font-size:9.5pt}
+
+.acoes-folha{display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap}
+
+.rodape{background:#000;border-top:2px solid var(--primary);padding:18px;text-align:center;}
+.rodape .exercito{font-size:.82rem;font-weight:700;text-transform:uppercase;letter-spacing:.18em;color:#fff}
+.rodape .lema{font-size:.78rem;color:rgba(255,255,255,.6);font-style:italic;margin-top:4px}
+
+.radios{display:flex;gap:22px;margin:16px 0;flex-wrap:wrap}
+.radios label{flex-direction:row;align-items:center;cursor:pointer;font-weight:500;color:var(--text)}
+.radios input{width:auto;accent-color:var(--primary-hover)}
+
+/* NOTIFICAÇÃO */
+.toast{
+  position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(100px);
+  background:#1a1a1a;border:1px solid var(--border-strong);border-radius:12px;
+  padding:12px 20px;color:#fff;font-size:.9rem;font-weight:600;
+  box-shadow:0 10px 40px rgba(0,0,0,.6);z-index:1000;
+  display:flex;align-items:center;gap:10px;
+  transition:transform .4s cubic-bezier(.175,.885,.32,1.275);
+  max-width:90vw;
+}
+.toast.visivel{transform:translateX(-50%) translateY(0)}
+.toast.sucesso{border-color:rgba(76,175,80,.5)}
+.toast.erro{border-color:rgba(255,107,107,.5)}
+
+@media(max-width:900px){
+  .contadores{grid-template-columns:1fr 1fr}
+  .contadores .card-contador:last-child{grid-column:1/-1}
+}
+@media(max-width:768px){
+  .assinaturas-grid{grid-template-columns:1fr}
+}
+@media(max-width:640px){
+  .cabecalho-inner{padding:10px 14px}
+  .marca img{width:36px;height:36px}
+  .marca-txt h1{font-size:.88rem}
+  .marca-txt p{font-size:.6rem}
+  .relogio .hora{font-size:.88rem}
+  .relogio .data{font-size:.6rem}
+  .app{padding:20px 14px 90px}
+  .aviso-backup{flex-direction:column;align-items:stretch}
+  .aviso-backup .acoes-backup{width:100%}
+  .aviso-backup .acoes-backup .btn{flex:1}
+  .contadores{grid-template-columns:1fr;gap:12px}
+  .contadores .card-contador:last-child{grid-column:auto}
+  .card-contador .num{font-size:2rem}
+  .card-contador:hover{transform:translateY(-2px)}
+  .barra-acoes{flex-direction:column;align-items:stretch}
+  .abas{overflow-x:auto}
+  .aba{padding:8px 14px;font-size:.82rem;white-space:nowrap}
+  .card-form{padding:18px}
+  .grid-form{grid-template-columns:1fr}
+  .linha-material{grid-template-columns:1fr 60px 40px}
+  .linha-material .mat-obs{grid-column:1/-1}
+  .item-cautela{padding:12px}
+  .item-cautela .avatar{width:38px;height:38px;font-size:.75rem}
+  .item-cautela .info h4{font-size:.9rem}
+  .barra-fixa .container{flex-direction:column;gap:10px;align-items:stretch}
+  .acoes-barra{width:100%}
+  .acoes-barra .btn{flex:1}
+  .folha-preview{padding:22px 16px;font-size:10pt}
+  .titulo-secao h2{font-size:1.15rem}
+  .acoes-folha{flex-direction:column}
+  .acoes-folha .btn{width:100%}
+}
+
+@media print{
+  @page{size:A4 portrait;margin:15mm 12mm}
+  html,body{background:#fff !important;color:#000 !important}
+  .cabecalho,.barra-fixa,.barra-acoes,.contadores,.acoes-folha,.btn,.rodape,.titulo-secao,.busca-wrap,.aviso-backup,.toast{display:none !important}
+  .app{padding:0 !important;max-width:none !important}
+  section{display:none !important}
+  #telaCautela{display:block !important}
+  .folha-container{padding:0;border:none;background:none;box-shadow:none;display:block;border-radius:0;perspective:none;margin:0}
+  .folha-preview{box-shadow:none;padding:0;max-width:100%;width:100%;transform:none !important;font-size:10pt}
+  .folha-preview *{-webkit-print-color-adjust:exact;print-color-adjust:exact;color:#000}
+  .doc-header p{font-size:10.5pt}
+  .doc-titulo{font-size:12pt}
+  .doc-tabela th{background:#eee !important}
+}
+</style>
+</head>
+<body>
+
+<header class="cabecalho">
+  <div class="cabecalho-inner">
+    <a href="/dashboard" class="marca">
+      <img src="/1cia.png" alt="Logo Enc Mat 1ª Cia">
+      <div class="marca-txt">
+        <h1>ENC MAT 1ª CIA</h1>
+        <p>Sistema de Gestão</p>
+      </div>
+    </a>
+    <div class="cabecalho-acoes">
+      <div class="relogio">
+        <div class="hora" id="relogioHora">--:--:--</div>
+        <div class="data" id="relogioData">--/--/----</div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main class="app" id="app">
+
+  <section id="telaDashboard">
+
+    <div class="aviso-backup">
+      <div class="txt">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#e0b451" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4"/><path d="M12 17h.01"/><circle cx="12" cy="12" r="10"/></svg>
+        <span><b>Backup diário recomendado.</b> Exporte o arquivo e guarde num lugar seguro.</span>
+      </div>
+      <div class="acoes-backup">
+        <button class="btn btn-secundario" onclick="exportarBackup()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Exportar Backup
+        </button>
+        <button class="btn btn-secundario" onclick="document.getElementById('inputImportar').click()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          Importar Backup
+        </button>
+        <input type="file" id="inputImportar" accept=".json,application/json" style="display:none" onchange="importarBackup(this)">
+      </div>
+    </div>
+
+    <div class="contadores">
+      <div class="card-contador pendente">
+        <div class="topo">
+          <h3>Pendentes</h3>
+          <div class="icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></div>
+        </div>
+        <div class="num" id="contPendentes">0</div>
+        <div class="sub" id="rodapePendentes">Nenhuma em aberto</div>
+      </div>
+      <div class="card-contador devolvida">
+        <div class="topo">
+          <h3>Devolvidas</h3>
+          <div class="icon"><svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg></div>
+        </div>
+        <div class="num" id="contDevolvidas">0</div>
+        <div class="sub" id="rodapeDevolvidas">Histórico vazio</div>
+      </div>
+      <div class="card-contador dias">
+        <div class="topo">
+          <h3>Mais Antiga</h3>
+          <div class="icon"><svg viewBox="0 0 24 24"><path d="M8 2v3"/><path d="M16 2v3"/><rect x="3" y="5" width="18" height="17" rx="2"/><path d="M3 10h18"/></svg></div>
+        </div>
+        <div class="num" id="contDias">0</div>
+        <div class="sub" id="rodapeDias">Dias pendente</div>
+      </div>
+    </div>
+
+    <div class="barra-acoes">
+      <div class="abas">
+        <button class="aba ativa" data-aba="pendentes" onclick="mudarAba('pendentes')">Pendentes <span class="badge" id="abaPendentes">0</span></button>
+        <button class="aba" data-aba="todas" onclick="mudarAba('todas')">Todas <span class="badge" id="abaTodas">0</span></button>
+        <button class="aba" onclick="abrirNova()">+ Nova</button>
+      </div>
+      <div class="busca-wrap">
+        <input type="text" id="busca" placeholder="Buscar por nome ou material..." oninput="renderDashboard()">
+      </div>
+    </div>
+
+    <div id="listaCautelas" class="lista-cautelas"></div>
+  </section>
+
+  <section id="telaNova" class="escondido">
+    <div class="titulo-secao">
+      <h2>Nova Cautela</h2>
+      <button class="btn btn-secundario" onclick="voltarDashboard()">← Voltar</button>
+    </div>
+
+    <form id="formNova" onsubmit="salvarNova(event)">
+      <div class="card-form">
+        <h2>Dados do Militar que Recebe</h2>
+        <div class="grid-form">
+          <label>Posto/Grad <span class="obrig">*</span><input type="text" name="posto" required placeholder="Ex: Sd, Cb, 3º Sgt"></label>
+          <label>Nome Completo <span class="obrig">*</span><input type="text" name="nome" required></label>
+          <label>OM/SU <input type="text" name="om"></label>
+          <label>Telefone <input type="tel" name="telefone" oninput="mascaraTel(this)"></label>
+          <label>Data <span class="obrig">*</span><input type="date" name="data" required></label>
+        </div>
+      </div>
+
+      <div class="card-form">
+        <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border);padding-bottom:14px;margin-bottom:18px">
+          <h2 style="border:none;padding:0;margin:0">Materiais (Até 8)</h2>
+          <span id="contadorMat" style="font-size:.85rem;color:var(--primary-light);font-weight:700">0 / 8</span>
+        </div>
+        <div id="materiais"></div>
+        <button type="button" class="btn-add" id="btnAddMaterial" onclick="addLinhaMaterial()">+ Adicionar Material</button>
+      </div>
+
+      <div class="card-form">
+        <h2>Assinaturas</h2>
+        <div class="grid-form" style="margin-bottom:18px">
+          <label>Graduação de Quem Cautelou (Visto) <span class="obrig">*</span><input type="text" name="vistoGrad" required placeholder="Ex: 1º Sgt"></label>
+          <label>Nome de Quem Cautelou (Visto) <span class="obrig">*</span><input type="text" name="vistoNome" required placeholder="Encarregado de Materiais"></label>
+        </div>
+
+        <div class="assinaturas-grid">
+          <div class="assinatura-bloco">
+            <div class="titulo-assinatura">
+              <span>Assinatura do Visto</span>
+              <span class="status" id="statusAssVisto">Sem assinatura</span>
+            </div>
+            <div class="canvas-wrapper" id="wrapVisto">
+              <canvas id="canvasVisto"></canvas>
+              <div class="dica">Quem cautelou assina aqui</div>
+            </div>
+            <button type="button" class="btn btn-secundario" style="padding:8px 14px;font-size:.82rem" onclick="limparAssinaturaVisto()">Limpar</button>
+          </div>
+
+          <div class="assinatura-bloco">
+            <div class="titulo-assinatura">
+              <span>Assinatura do Militar</span>
+              <span class="status" id="statusAssMilitar">Sem assinatura</span>
+            </div>
+            <div class="canvas-wrapper" id="wrapAssinatura">
+              <canvas id="canvasAssinatura"></canvas>
+              <div class="dica">Quem recebe assina aqui</div>
+            </div>
+            <button type="button" class="btn btn-secundario" style="padding:8px 14px;font-size:.82rem" onclick="limparAssinatura()">Limpar</button>
+          </div>
+        </div>
+      </div>
+    </form>
+  </section>
+
+  <section id="telaCautela" class="escondido">
+    <div class="titulo-secao">
+      <h2>Ficha de Cautela</h2>
+      <button class="btn btn-secundario" onclick="voltarDashboard()">← Voltar</button>
+    </div>
+    <div class="folha-container">
+      <div class="folha-preview" id="folhaImpressao"></div>
+    </div>
+    <div class="acoes-folha">
+      <button class="btn btn-primario" onclick="window.print()">Imprimir / PDF</button>
+      <button class="btn btn-secundario" id="btnDevolver" onclick="abrirDevolucao()">Registrar Devolução</button>
+      <button class="btn btn-perigo" onclick="excluirCautela()">Excluir</button>
+    </div>
+  </section>
+
+  <section id="telaDevolucao" class="escondido">
+    <div class="titulo-secao">
+      <h2>Registrar Devolução</h2>
+      <button class="btn btn-secundario" onclick="voltarCautela()">Cancelar</button>
+    </div>
+    <form id="formDevolucao" onsubmit="confirmarDevolucao(event)">
+      <div class="card-form">
+        <h2>Dados da Devolução</h2>
+        <div class="grid-form">
+          <label>Data da Devolução <span class="obrig">*</span><input type="date" name="dataDev" required></label>
+        </div>
+        <div class="radios">
+          <label><input type="radio" name="alteracao" value="sem" checked onchange="toggleAlteracao()"> Sem Alteração</label>
+          <label><input type="radio" name="alteracao" value="com" onchange="toggleAlteracao()"> Com Alteração</label>
+        </div>
+        <label id="campoAlteracao" class="escondido" style="margin-bottom:18px">Descreva a alteração<textarea name="descAlteracao" rows="2"></textarea></label>
+        <div class="grid-form" style="margin-bottom:18px">
+          <label>Graduação de quem recebeu <span class="obrig">*</span><input type="text" name="recebGrad" required></label>
+          <label>Nome de quem recebeu <span class="obrig">*</span><input type="text" name="recebNome" required></label>
+        </div>
+        <label style="margin-bottom:10px">Assinatura de quem recebeu <span class="obrig">*</span></label>
+        <div class="canvas-wrapper" id="wrapRecebimento">
+          <canvas id="canvasRecebimento"></canvas>
+          <div class="dica">Assine aqui com o dedo ou mouse</div>
+        </div>
+        <button type="button" class="btn btn-secundario" style="margin-top:12px" onclick="limparCanvasReceb()">Limpar Assinatura</button>
+      </div>
+      <div style="text-align:right">
+        <button type="submit" class="btn btn-primario">Confirmar Devolução</button>
+      </div>
+    </form>
+  </section>
+
+</main>
+
+<div class="barra-fixa escondido" id="barraSalvar">
+  <div class="container">
+    <div class="info-barra">
+      <span class="chip" id="chipMat">0 materiais</span>
+      <span class="chip" id="chipVisto">Visto: pendente</span>
+      <span class="chip" id="chipAss">Militar: pendente</span>
+    </div>
+    <div class="acoes-barra">
+      <button class="btn btn-secundario" onclick="voltarDashboard()">Cancelar</button>
+      <button class="btn btn-primario" id="btnSalvar" onclick="document.getElementById('formNova').requestSubmit()" disabled>Salvar Cautela</button>
+    </div>
+  </div>
+</div>
+
+<footer class="rodape">
+  <div class="exercito">Exército Brasileiro</div>
+  <div class="lema">Braço Forte — Mão Amiga</div>
+</footer>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* =========================================================
+   VERSÃO SERVIDOR — compartilhada entre todos os celulares
+   ========================================================= */
+
+function atualizarRelogio(){
+  const agora = new Date();
+  const h = document.getElementById('relogioHora');
+  const d = document.getElementById('relogioData');
+  if(h) h.textContent = agora.toLocaleTimeString('pt-BR');
+  if(d) d.textContent = agora.toLocaleDateString('pt-BR');
+}
+setInterval(atualizarRelogio, 1000);
+atualizarRelogio();
+
+let cautelas = [];
+let abaAtiva = 'pendentes';
+let idAtual = null;
+let ctxVisto, ctxAss, ctxReceb;
+
+const $ = s => document.querySelector(s);
+const $$ = s => [...document.querySelectorAll(s)];
+
+/* ---------- TOAST ---------- */
+let toastTimer;
+function toast(msg, tipo = 'sucesso'){
+  const el = $('#toast');
+  el.textContent = msg;
+  el.className = 'toast visivel ' + tipo;
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('visivel'), 3000);
+}
+
+/* ---------- API ---------- */
+async function apiListar(){
+  const r = await fetch('/api/cautelas');
+  if(!r.ok) throw new Error('Erro ao listar');
+  return await r.json();
+}
+async function apiCriar(cautela){
+  const r = await fetch('/api/cautelas', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify(cautela)
+  });
+  if(!r.ok) throw new Error('Erro ao criar');
+  return await r.json();
+}
+async function apiExcluir(id){
+  const r = await fetch('/api/cautelas/' + id, { method: 'DELETE' });
+  if(!r.ok) throw new Error('Erro ao excluir');
+  return await r.json();
+}
+async function apiDevolver(id, dados){
+  const r = await fetch('/api/cautelas/' + id + '/devolucao', {
+    method: 'PUT',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify(dados)
+  });
+  if(!r.ok) throw new Error('Erro ao devolver');
+  return await r.json();
+}
+async function apiBackup(){
+  const r = await fetch('/api/backup');
+  if(!r.ok) throw new Error('Erro ao baixar backup');
+  const blob = await r.blob();
+  const url = window.URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'backup_cautelas_' + new Date().toISOString().slice(0,10) + '.json';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+async function apiImportar(lista, modo){
+  const r = await fetch('/api/backup?modo=' + modo, {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify(lista)
+  });
+  if(!r.ok) throw new Error('Erro ao importar');
+  return await r.json();
+}
+
+/* ---------- UTIL ---------- */
+function formatarData(iso){ if(!iso) return ''; const [a,m,d] = iso.split('-'); return `${d}/${m}/${a}`; }
+function diasDesde(iso){
+  if(!iso) return 0;
+  const d1 = new Date(iso + 'T00:00:00');
+  const d2 = new Date(); d2.setHours(0,0,0,0);
+  return Math.max(0, Math.floor((d2 - d1) / 86400000));
+}
+function mascaraTel(input){
+  let v = input.value.replace(/\D/g, '').slice(0, 11);
+  if (v.length > 6) v = `(${v.slice(0,2)}) ${v.slice(2,7)}-${v.slice(7)}`;
+  else if (v.length > 2) v = `(${v.slice(0,2)}) ${v.slice(2)}`;
+  else if (v.length > 0) v = `(${v}`;
+  input.value = v;
+}
+function obterIniciais(posto, nome){
+  const p = (posto || '').trim().slice(0, 2).toUpperCase();
+  const n = (nome || '').trim().split(/\s+/)[0]?.slice(0, 1).toUpperCase() || '';
+  return (p + n) || '??';
+}
+
+/* ---------- NAVEGAÇÃO ---------- */
+function abrirTela(id){
+  $$('main section').forEach(s => s.classList.add('escondido'));
+  $('#' + id).classList.remove('escondido');
+  $('#barraSalvar').classList.toggle('escondido', id !== 'telaNova');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+function voltarDashboard(){ abrirTela('telaDashboard'); renderDashboard(); }
+
+function abrirNova(){
+  $('#formNova').reset();
+  $('#materiais').innerHTML = '';
+  addLinhaMaterial(); addLinhaMaterial();
+  $('#formNova [name="data"]').value = new Date().toISOString().slice(0,10);
+  abrirTela('telaNova');
+  setTimeout(() => {
+    if(ctxVisto){ ctxVisto.limpar(); ctxVisto.resize(); }
+    if(ctxAss){ ctxAss.limpar(); ctxAss.resize(); }
+    validarForm();
+  }, 60);
+}
+function mudarAba(aba){
+  abaAtiva = aba;
+  $$('.aba').forEach(b => b.classList.toggle('ativa', b.dataset.aba === aba));
+  renderDashboard();
+}
+
+/* ---------- DASHBOARD ---------- */
+async function carregarDoServidor(){
+  try {
+    cautelas = await apiListar();
+    renderDashboard();
+  } catch(e){
+    console.error(e);
+    toast('Erro ao carregar. Verifique a conexão.', 'erro');
+  }
+}
+
+function renderDashboard(){
+  const pendentes = cautelas.filter(c => c.status === 'pendente');
+  const devolvidas = cautelas.filter(c => c.status === 'devolvida');
+
+  $('#contPendentes').textContent = pendentes.length;
+  $('#contDevolvidas').textContent = devolvidas.length;
+  $('#abaPendentes').textContent = pendentes.length;
+  $('#abaTodas').textContent = cautelas.length;
+
+  let maisAntiga = 0;
+  pendentes.forEach(c => { const d = diasDesde(c.data); if(d > maisAntiga) maisAntiga = d; });
+  $('#contDias').textContent = maisAntiga;
+
+  $('#rodapePendentes').textContent = pendentes.length === 0
+    ? 'Nenhuma em aberto'
+    : `${pendentes.filter(c => diasDesde(c.data) >= 7).length} com +7 dias`;
+  $('#rodapeDevolvidas').textContent = devolvidas.length === 0 ? 'Histórico vazio' : 'No histórico';
+  $('#rodapeDias').textContent = maisAntiga === 0
+    ? 'Nenhuma pendência'
+    : (maisAntiga >= 7 ? 'Atenção recomendada' : 'Dentro do prazo');
+
+  const busca = $('#busca').value.trim().toLowerCase();
+  let lista = abaAtiva === 'pendentes' ? pendentes : cautelas;
+  if(busca){
+    lista = lista.filter(c =>
+      c.nome.toLowerCase().includes(busca) ||
+      (c.materiais || []).some(m => m.material.toLowerCase().includes(busca))
+    );
+  }
+  lista = [...lista].sort((a,b) => {
+    if(a.status !== b.status) return a.status === 'pendente' ? -1 : 1;
+    return (b.data || '').localeCompare(a.data || '');
+  });
+
+  const container = $('#listaCautelas');
+  if(lista.length === 0){
+    container.innerHTML = `<div class="vazio"><svg viewBox="0 0 24 24"><path d="M4 7l8-4 8 4v10a2 2 0 0 1-1 1.7l-7 4-7-4A2 2 0 0 1 4 17V7Z"/><path d="M12 3v18"/></svg><p>Nenhuma cautela encontrada.</p></div>`;
+    return;
+  }
+  container.innerHTML = lista.map(c => {
+    const dias = c.status === 'pendente' ? diasDesde(c.data) : 0;
+    const label = c.status === 'pendente'
+      ? (dias === 0 ? 'Hoje' : `Há ${dias}d`)
+      : 'Devolvida';
+    return `
+      <div class="item-cautela" onclick="abrirCautela('${c.id}')">
+        <div class="avatar">${obterIniciais(c.posto, c.nome)}</div>
+        <div class="info">
+          <h4>${c.posto} ${c.nome}</h4>
+          <p>${(c.materiais||[]).length} material(is) • ${formatarData(c.data)}</p>
+        </div>
+        <div class="status ${c.status}">${label}</div>
+      </div>
+    `;
+  }).join('');
+}
+
+/* ---------- MATERIAIS ---------- */
+function addLinhaMaterial(){
+  const container = $('#materiais');
+  if(container.children.length >= 8) return;
+  const div = document.createElement('div');
+  div.className = 'linha-material';
+  div.innerHTML = `
+    <input type="text" placeholder="Material" class="mat-nome" required oninput="validarForm()">
+    <input type="number" placeholder="Qtd" class="mat-qtd" value="1" min="1" required oninput="validarForm()">
+    <input type="text" placeholder="Observação" class="mat-obs">
+    <button type="button" class="btn-remover" onclick="this.parentElement.remove(); atualizarContadorMat(); validarForm();" aria-label="Remover">×</button>
+  `;
+  container.appendChild(div);
+  atualizarContadorMat();
+  validarForm();
+}
+function atualizarContadorMat(){
+  const qtd = $('#materiais').children.length;
+  $('#contadorMat').textContent = `${qtd} / 8`;
+  $('#btnAddMaterial').disabled = qtd >= 8;
+}
+
+/* ---------- CANVAS ASSINATURA ---------- */
+function initCanvas(canvasId, wrapId){
+  const canvas = $('#' + canvasId);
+  const wrap = $('#' + wrapId);
+  const ctx = canvas.getContext('2d');
+  let pontos = [];
+  let desenhando = false;
+  let ratio = 1;
+
+  function resize(){
+    ratio = window.devicePixelRatio || 1;
+    const rect = canvas.getBoundingClientRect();
+    if(rect.width < 10 || rect.height < 10) return;
+    canvas.width = Math.round(rect.width * ratio);
+    canvas.height = Math.round(rect.height * ratio);
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.scale(ratio, ratio);
+    ctx.lineWidth = 2.5;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    ctx.strokeStyle = '#111';
+    redraw();
+  }
+  function redraw(){
+    const rect = canvas.getBoundingClientRect();
+    ctx.clearRect(0, 0, rect.width, rect.height);
+    if(pontos.length < 2) return;
+    ctx.beginPath();
+    ctx.moveTo(pontos[0].x, pontos[0].y);
+    for(let i = 1; i < pontos.length; i++) ctx.lineTo(pontos[i].x, pontos[i].y);
+    ctx.stroke();
+  }
+  const getPos = e => {
+    const r = canvas.getBoundingClientRect();
+    const p = e.touches ? e.touches[0] : e;
+    return { x: p.clientX - r.left, y: p.clientY - r.top };
+  };
+  const iniciar = e => { e.preventDefault(); desenhando = true; pontos = [getPos(e)]; wrap.classList.add('assinado'); validarForm(); };
+  const mover = e => { if(!desenhando) return; e.preventDefault(); pontos.push(getPos(e)); redraw(); };
+  const parar = () => { if(!desenhando) return; desenhando = false; validarForm(); };
+
+  canvas.addEventListener('mousedown', iniciar);
+  canvas.addEventListener('mousemove', mover);
+  canvas.addEventListener('mouseup', parar);
+  canvas.addEventListener('mouseleave', parar);
+  canvas.addEventListener('touchstart', iniciar, { passive: false });
+  canvas.addEventListener('touchmove', mover, { passive: false });
+  canvas.addEventListener('touchend', parar);
+
+  return { canvas, resize, pontos: () => pontos, limpar: () => { pontos = []; redraw(); wrap.classList.remove('assinado'); validarForm(); } };
+}
+
+window.addEventListener('load', () => {
+  ctxVisto = initCanvas('canvasVisto', 'wrapVisto');
+  ctxAss = initCanvas('canvasAssinatura', 'wrapAssinatura');
+  ctxReceb = initCanvas('canvasRecebimento', 'wrapRecebimento');
+  carregarDoServidor();
+});
+
+window.addEventListener('resize', () => {
+  if(ctxVisto && $('#telaNova') && !$('#telaNova').classList.contains('escondido')) ctxVisto.resize();
+  if(ctxAss && $('#telaNova') && !$('#telaNova').classList.contains('escondido')) ctxAss.resize();
+  if(ctxReceb && $('#telaDevolucao') && !$('#telaDevolucao').classList.contains('escondido')) ctxReceb.resize();
+});
+
+function limparAssinaturaVisto(){ if(ctxVisto) ctxVisto.limpar(); }
+function limparAssinatura(){ if(ctxAss) ctxAss.limpar(); }
+function limparCanvasReceb(){ if(ctxReceb) ctxReceb.limpar(); }
+function temAssinatura(obj){ return obj && obj.pontos().length >= 2; }
+
+/* ---------- VALIDAÇÃO ---------- */
+function validarForm(){
+  const form = $('#formNova');
+  const posto = form.posto.value.trim();
+  const nome = form.nome.value.trim();
+  const data = form.data.value;
+  const vGrad = form.vistoGrad.value.trim();
+  const vNome = form.vistoNome.value.trim();
+  const mats = $$('.mat-nome').filter(i => i.value.trim()).length;
+  const assVisto = ctxVisto ? temAssinatura(ctxVisto) : false;
+  const assMilitar = ctxAss ? temAssinatura(ctxAss) : false;
+
+  const ok = !!(posto && nome && data && vGrad && vNome && mats > 0 && assVisto && assMilitar);
+  if($('#btnSalvar')) $('#btnSalvar').disabled = !ok;
+
+  if($('#chipMat')){
+    $('#chipMat').textContent = `${mats} material(is)`;
+    $('#chipMat').classList.toggle('ok', mats > 0);
+  }
+  if($('#chipVisto')){
+    $('#chipVisto').textContent = assVisto ? 'Visto: ok' : 'Visto: pendente';
+    $('#chipVisto').classList.toggle('ok', assVisto);
+  }
+  if($('#chipAss')){
+    $('#chipAss').textContent = assMilitar ? 'Militar: ok' : 'Militar: pendente';
+    $('#chipAss').classList.toggle('ok', assMilitar);
+  }
+  if($('#statusAssVisto')){
+    $('#statusAssVisto').textContent = assVisto ? 'Assinado' : 'Sem assinatura';
+    $('#statusAssVisto').classList.toggle('ok', assVisto);
+  }
+  if($('#statusAssMilitar')){
+    $('#statusAssMilitar').textContent = assMilitar ? 'Assinado' : 'Sem assinatura';
+    $('#statusAssMilitar').classList.toggle('ok', assMilitar);
+  }
+}
+document.addEventListener('input', e => { if(e.target.closest('#formNova')) validarForm(); });
+
+/* ---------- SALVAR NOVA ---------- */
+async function salvarNova(e){
+  e.preventDefault();
+  if($('#btnSalvar').disabled) return;
+
+  const form = $('#formNova');
+  const materiais = [];
+  $$('.linha-material').forEach(linha => {
+    const m = linha.querySelector('.mat-nome').value.trim();
+    if(m) materiais.push({
+      material: m,
+      qtd: linha.querySelector('.mat-qtd').value,
+      obs: linha.querySelector('.mat-obs').value.trim()
+    });
+  });
+
+  const nova = {
+    posto: form.posto.value.trim(),
+    nome: form.nome.value.trim(),
+    om: form.om.value.trim(),
+    telefone: form.telefone.value.trim(),
+    data: form.data.value,
+    materiais,
+    vistoGrad: form.vistoGrad.value.trim(),
+    vistoNome: form.vistoNome.value.trim(),
+    assinaturaVisto: ctxVisto.canvas.toDataURL('image/png'),
+    assinaturaMilitar: ctxAss.canvas.toDataURL('image/png'),
+    status: 'pendente',
+    devolucao: null
+  };
+
+  try {
+    const criada = await apiCriar(nova);
+    await carregarDoServidor();
+    toast('Cautela salva com sucesso!', 'sucesso');
+    abrirCautela(criada.id);
+  } catch(err){
+    toast('Erro ao salvar. Verifique a conexão.', 'erro');
+    console.error(err);
+  }
+}
+
+/* ---------- FICHA ---------- */
+function abrirCautela(id){
+  idAtual = id;
+  const c = cautelas.find(x => x.id === id);
+  if(!c) return;
+
+  let linhasTab = '';
+  for(let i = 0; i < 8; i++){
+    const mat = c.materiais ? c.materiais[i] : null;
+    linhasTab += `
+      <tr>
+        <td class="col-nr">${String(i+1).padStart(2,'0')}</td>
+        <td>${mat ? mat.material : ''}</td>
+        <td class="col-qtd">${mat ? mat.qtd : ''}</td>
+        <td>${mat ? (mat.obs || '') : ''}</td>
+      </tr>`;
+  }
+
+  const dataObj = new Date(c.data + 'T00:00:00');
+  const meses = ['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
+  const dia = dataObj.getDate();
+  const mes = meses[dataObj.getMonth()];
+  const ano = dataObj.getFullYear();
+
+  let devTitulo, checkSem, checkCom, alteracaoTxt, assinaturaRecebImg, recebGradNome;
+  if(c.status === 'devolvida' && c.devolucao){
+    const dData = c.devolucao.data.split('-');
+    const dDia = parseInt(dData[2]);
+    const dMes = meses[parseInt(dData[1]) - 1];
+    const dAno = dData[0];
+    devTitulo = `DEVOLUÇÃO DO MATERIAL EM ${dDia} DE ${dMes} DE ${dAno}`;
+    checkSem = c.devolucao.alteracao === 'sem' ? '<b>X</b>' : '&nbsp;&nbsp;';
+    checkCom = c.devolucao.alteracao === 'com' ? '<b>X</b>' : '&nbsp;&nbsp;';
+    alteracaoTxt = (c.devolucao.alteracao === 'com' && c.devolucao.descricao) ? c.devolucao.descricao : '';
+    assinaturaRecebImg = `<img src="${c.devolucao.assinatura}" alt="">`;
+    recebGradNome = `<p>${c.devolucao.recebGrad} ${c.devolucao.recebNome}</p>`;
+  } else {
+    devTitulo = 'DEVOLUÇÃO DO MATERIAL EM ____ DE ______________ DE 202____';
+    checkSem = '&nbsp;&nbsp;';
+    checkCom = '&nbsp;&nbsp;';
+    alteracaoTxt = '';
+    assinaturaRecebImg = '';
+    recebGradNome = `<p>GRAD ____________________ &nbsp;&nbsp; NOME _______________________________</p>`;
+  }
+
+  $('#folhaImpressao').innerHTML = `
+    <div class="doc-header">
+      <p>EXÉRCITO BRASILEIRO</p>
+      <p>COMANDO MILITAR DO PLANALTO</p>
+      <p>BATALHÃO DA GUARDA PRESIDENCIAL</p>
+      <p class="sub">(Batalhão do Imperador – 1823)</p>
+      <p>BATALHÃO DUQUE DE CAXIAS</p>
+      <p>1ª CIA DE INFANTARIA DE GUARDAS</p>
+    </div>
+    <div class="doc-visto">
+      Visto:<br>
+      Grad <b>${c.vistoGrad || '________'}</b> &nbsp; Nome <b>${c.vistoNome || '____________________'}</b><br>
+      <img src="${c.assinaturaVisto}" alt="Assinatura do Visto">
+      <span class="legenda">Militar que cautelou o material</span>
+    </div>
+    <div class="doc-titulo">CAUTELA DE MATERIAIS/EQUIPAMENTOS</div>
+    <div class="doc-texto">
+      Recebi, mediante esta cautela, do Enc Mat da 1ª Cia Inf Gd, o material abaixo relacionado, ficando sob minha responsabilidade a guarda, a manutenção e o zelo do(s) mesmo(s). Após uso, comprometo-me a devolvê-lo(s) limpo(s) e no estado de conservação como recebido(s). Em caso de algum dano, avaria ou extravio, providenciarei a manutenção, reposição e/ou indenização ao erário público do(s) respectivo(s) bem(ns).
+    </div>
+    <table class="doc-tabela">
+      <thead>
+        <tr><th class="col-nr">Nr Ord</th><th>MATERIAL</th><th class="col-qtd">QTD</th><th>E OBS</th></tr>
+      </thead>
+      <tbody>${linhasTab}</tbody>
+    </table>
+    <div class="doc-data">Brasília, DF, ${dia} de ${mes} de ${ano}</div>
+    <div class="doc-assinatura">
+      <img src="${c.assinaturaMilitar}" alt="Assinatura do Responsável">
+      <div class="linha">Assinatura do Responsável</div>
+    </div>
+    <div class="doc-dados">
+      <div class="titulo-dados">Dados do Responsável</div>
+      <div class="linha-dado"><b>POSTO/GRAD:</b> ${c.posto}</div>
+      <div class="linha-dado"><b>NOME COMPLETO:</b> ${c.nome}</div>
+      <div class="linha-dado"><b>OM/SU:</b> ${c.om || '_________________________'}</div>
+      <div class="linha-dado"><b>TELEFONE:</b> ${c.telefone || '_________________________'}</div>
+    </div>
+    <div class="doc-devolucao">
+      <div class="titulo-dev">${devTitulo}</div>
+      <p>Recebi o material cautelado, acima descrito,</p>
+      <div class="check">
+        <span>( ${checkSem} ) SEM ALTERAÇÃO</span>
+        <span>( ${checkCom} ) COM ALTERAÇÃO</span>
+      </div>
+      <p>Lançar as alterações abaixo, se existir:</p>
+      <div class="linha-alteracao">${alteracaoTxt}</div>
+      <div class="doc-assinatura-receb">
+        ${assinaturaRecebImg}
+        <div class="linha">Assinatura de quem recebeu o material</div>
+        ${recebGradNome}
+        <p>ENC MAT/Aux Enc Mat</p>
+      </div>
+    </div>
+  `;
+
+  $('#btnDevolver').style.display = c.status === 'pendente' ? 'inline-flex' : 'none';
+  abrirTela('telaCautela');
+}
+
+/* ---------- EXCLUIR ---------- */
+async function excluirCautela(){
+  if(!confirm('Tem certeza que deseja excluir esta cautela?')) return;
+  try {
+    await apiExcluir(idAtual);
+    await carregarDoServidor();
+    toast('Cautela excluída.', 'sucesso');
+    voltarDashboard();
+  } catch(err){
+    toast('Erro ao excluir.', 'erro');
+  }
+}
+
+/* ---------- DEVOLUÇÃO ---------- */
+function abrirDevolucao(){
+  const form = $('#formDevolucao');
+  form.reset();
+  form.dataDev.value = new Date().toISOString().slice(0,10);
+  $('#campoAlteracao').classList.add('escondido');
+  abrirTela('telaDevolucao');
+  setTimeout(() => {
+    if(ctxReceb){ ctxReceb.limpar(); ctxReceb.resize(); }
+  }, 60);
+}
+function toggleAlteracao(){
+  const comAlt = $('input[name="alteracao"][value="com"]').checked;
+  $('#campoAlteracao').classList.toggle('escondido', !comAlt);
+}
+function voltarCautela(){ abrirTela('telaCautela'); }
+
+async function confirmarDevolucao(e){
+  e.preventDefault();
+  if(!temAssinatura(ctxReceb)){ toast('Assine no campo indicado.', 'erro'); return; }
+  const form = $('#formDevolucao');
+  const dados = {
+    data: form.dataDev.value,
+    alteracao: form.alteracao.value,
+    descricao: form.alteracao.value === 'com' ? form.descAlteracao.value : '',
+    recebGrad: form.recebGrad.value.trim(),
+    recebNome: form.recebNome.value.trim(),
+    assinatura: ctxReceb.canvas.toDataURL('image/png')
+  };
+  try {
+    await apiDevolver(idAtual, dados);
+    await carregarDoServidor();
+    toast('Devolução registrada!', 'sucesso');
+    abrirCautela(idAtual);
+  } catch(err){
+    toast('Erro ao registrar devolução.', 'erro');
+  }
+}
+
+/* ---------- BACKUP ---------- */
+async function exportarBackup(){
+  try {
+    await apiBackup();
+    toast('Backup exportado!', 'sucesso');
+  } catch(err){
+    toast('Erro ao gerar backup.', 'erro');
+  }
+}
+
+async function importarBackup(input){
+  const file = input.files[0];
+  if(!file) return;
+  try {
+    const texto = await file.text();
+    const lista = JSON.parse(texto);
+    if(!Array.isArray(lista)){
+      toast('Arquivo inválido.', 'erro');
+      return;
+    }
+    const modo = confirm(
+      'Substituir tudo pelo backup?\n\n' +
+      'OK = Substituir (perde o que está no servidor)\n' +
+      'Cancelar = Mesclar (mantém tudo, adiciona só o que falta)'
+    ) ? 'substituir' : 'mesclar';
+
+    const r = await apiImportar(lista, modo);
+    toast(`Backup importado! Total: ${r.total}`, 'sucesso');
+    await carregarDoServidor();
+  } catch(err){
+    toast('Erro ao importar. Verifique o arquivo.', 'erro');
+  }
+  input.value = '';
+}
+</script>
+</body>
+</html>

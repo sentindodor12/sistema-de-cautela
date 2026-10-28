@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+<title>Enc Mat 1ª Cia — Carregando</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+
+:root{
+  --primary:#8b0000;
+  --primary-hover:#c0392b;
+  --primary-light:#e74c3c;
+}
+
+html{-webkit-tap-highlight-color:transparent}
+
+body{
+  font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen,Ubuntu,sans-serif;
+  background:#0a0a0a;
+  min-height:100vh;
+  overflow:hidden;
+  -webkit-font-smoothing:antialiased;
+}
+
+#splashScreen{
+  position:fixed;inset:0;
+  background:radial-gradient(ellipse at center,#0a0a0a 0%,#000 100%);
+  display:flex;align-items:center;justify-content:center;
+  perspective:1200px;
+  transition:opacity .8s ease;
+}
+
+.splash-content{
+  text-align:center;
+  padding:20px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  animation:splashEntrance 4s ease forwards;
+}
+@keyframes splashEntrance{
+  0%{transform:scale(1.1);opacity:0}
+  15%{transform:scale(1);opacity:1}
+  100%{transform:scale(1);opacity:1}
+}
+
+.splash-logo-wrapper{
+  position:relative;
+  width:200px;height:200px;
+  display:flex;align-items:center;justify-content:center;
+  margin-bottom:10px;
+}
+.splash-logo-wrapper::before{
+  content:'';
+  position:absolute;inset:0;
+  background:radial-gradient(circle,rgba(139,0,0,.15) 0%,transparent 70%);
+  border-radius:50%;
+  animation:logoPulse 2s ease-in-out infinite;
+}
+@keyframes logoPulse{
+  0%,100%{transform:scale(1);opacity:.6}
+  50%{transform:scale(1.2);opacity:.2}
+}
+
+.orbit-ring{
+  position:absolute;
+  border:1px solid rgba(139,0,0,.15);
+  border-radius:50%;
+  animation:orbitSpin 8s linear infinite;
+}
+.orbit-ring:nth-child(1){width:170px;height:170px;animation-duration:6s}
+.orbit-ring:nth-child(2){width:210px;height:210px;animation-duration:10s;animation-direction:reverse;border-color:rgba(139,0,0,.08)}
+.orbit-ring:nth-child(3){width:250px;height:250px;animation-duration:14s;border-color:rgba(255,255,255,.03)}
+@keyframes orbitSpin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
+
+.splash-logo{
+  position:relative;z-index:2;
+  display:flex;flex-direction:column;align-items:center;gap:6px;
+  animation:logo3DIn 1.4s ease-out forwards;
+  transform:rotateX(-20deg) rotateY(10deg) scale(.7);
+  opacity:0;
+}
+@keyframes logo3DIn{
+  0%{transform:rotateX(-40deg) rotateY(30deg) scale(.5) translateZ(-100px);opacity:0}
+  60%{transform:rotateX(5deg) rotateY(-5deg) scale(1.05);opacity:1}
+  100%{transform:rotateX(0) rotateY(0) scale(1);opacity:1}
+}
+
+.splash-logo img{
+  width:110px;height:110px;object-fit:contain;
+  filter:drop-shadow(0 0 60px rgba(139,0,0,.4));
+  animation:logoGlow 2.5s ease-in-out infinite alternate;
+}
+@keyframes logoGlow{
+  0%{filter:drop-shadow(0 0 30px rgba(139,0,0,.2))}
+  100%{filter:drop-shadow(0 0 80px rgba(139,0,0,.6))}
+}
+
+.splash-title{
+  font-size:26px;font-weight:800;color:#fff;
+  letter-spacing:6px;white-space:nowrap;
+  animation:title3DIn 1s ease-out .5s forwards;
+  opacity:0;transform:translateZ(-50px);
+  text-shadow:0 0 40px rgba(139,0,0,.3);
+}
+@keyframes title3DIn{
+  0%{transform:translateZ(-50px);opacity:0}
+  100%{transform:translateZ(0);opacity:1}
+}
+
+.splash-subtitle{
+  font-size:12px;color:#888;letter-spacing:5px;
+  animation:title3DIn 1s ease-out .8s forwards;
+  opacity:0;transform:translateZ(-30px);
+}
+
+.loader-3d{
+  margin-top:30px;width:50px;height:50px;position:relative;
+  animation:loaderFloat 1.5s ease-in-out infinite;
+}
+@keyframes loaderFloat{
+  0%,100%{transform:translateY(0)}
+  50%{transform:translateY(-8px)}
+}
+.loader-3d .ring{
+  position:absolute;width:100%;height:100%;
+  border:3px solid transparent;border-radius:50%;
+  animation:ringSpin 1.2s cubic-bezier(.6,0,.4,1) infinite;
+}
+.loader-3d .ring:nth-child(1){border-top-color:var(--primary);animation-duration:1s}
+.loader-3d .ring:nth-child(2){border-right-color:var(--primary-hover);animation-duration:1.4s;width:70%;height:70%;top:15%;left:15%}
+.loader-3d .ring:nth-child(3){border-bottom-color:#fff;animation-duration:1.8s;width:40%;height:40%;top:30%;left:30%}
+@keyframes ringSpin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
+
+@media(max-width:400px){
+  .splash-logo img{width:80px;height:80px}
+  .splash-logo-wrapper{width:160px;height:160px}
+  .orbit-ring:nth-child(1){width:130px;height:130px}
+  .orbit-ring:nth-child(2){width:170px;height:170px}
+  .orbit-ring:nth-child(3){width:210px;height:210px}
+  .splash-title{font-size:18px;letter-spacing:3px}
+  .loader-3d{width:40px;height:40px}
+}
+</style>
+</head>
+<body>
+
+<div id="splashScreen">
+  <div class="splash-content">
+    <div class="splash-logo-wrapper">
+      <div class="orbit-ring"></div>
+      <div class="orbit-ring"></div>
+      <div class="orbit-ring"></div>
+      <div class="splash-logo">
+        <img src="/1cia.png" alt="Logo Enc Mat 1ª Cia">
+        <div class="splash-title">ENC MAT 1ª CIA</div>
+        <div class="splash-subtitle">Sistema de Gestão</div>
+      </div>
+    </div>
+    <div class="loader-3d">
+      <div class="ring"></div>
+      <div class="ring"></div>
+      <div class="ring"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Após 4 segundos, fade out e redireciona para o dashboard (rota do Flask)
+  setTimeout(() => {
+    const splash = document.getElementById('splashScreen');
+    splash.style.opacity = '0';
+    setTimeout(() => {
+      window.location.href = '/dashboard';
+    }, 800);
+  }, 4000);
+</script>
+</body>
+</html>
